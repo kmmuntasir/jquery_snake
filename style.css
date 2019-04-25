@@ -1,0 +1,59 @@
+body {
+	margin:0;
+	padding:0;
+	clear:both;
+}
+
+/** {
+	transition: all 100ms ease;
+}*/
+
+.clear {
+	width:0;
+	height: 0;
+	clear: both;
+}
+
+.container {
+	margin:0 auto;
+	width:900px;
+	padding-top:20px;
+}
+
+.field {
+	background-color: #09f;
+	border: solid 1px #000;
+	min-width:500px;
+	width:500px;
+	min-height:500px;
+}
+
+.left {
+	float:left;
+}
+.right {
+	float:right;
+	width:358px;
+	padding:20px;
+}
+
+.cell {
+	background-color: rgba(255,255,255,0.8);
+	width:10px;
+	height:10px;
+	float:left;
+}
+
+.green {
+	background-color: #0b9;
+}
+.red {
+	background-color: #f09;
+}
+.head {
+	background-color: #000;
+}
+
+.food {
+	background-color: #000;
+}
