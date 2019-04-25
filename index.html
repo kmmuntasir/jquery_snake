@@ -1,7 +1,7 @@
 <!Doctype html>
 <html>
 	<head>
-		<title>Snake 2017</title>
+		<title>jQuery Snake</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 
@@ -18,7 +18,43 @@
 
 				<button id="start_button">Start Game</button>
 				<button id="pause_button">Pause Game</button>
-				<button id="restart_button">Restart Game</button>
+				<button id="restart_button">Restart Game</button><br><br>
+
+				<label for="speed">Snake Speed <i><small>(1-10)</small></i></label>
+				<input type="number" max="10" min="1" id="speed" value="7"><br><br>
+
+				<input type="checkbox" id="opposite_direction_allowed">				
+				<label for="opposite_direction_allowed">Allow Opposite Direction?</label><br>
+				<i><small>Allowing opposite direction will enable the snake to go in directly opposite of the current direction, it will even be able to cross over it's own body.</small></i>
+
+				<hr>
+				<h4>Keyboard Shortcuts</h4>
+				<table border="1" cellpadding="5" cellspacing="0" width="100%">
+					<tr>
+						<td>Arrow Keys<br>Or W/A/S/D</td>
+						<td>Start/Resume Game</td>
+					</tr>
+					<tr>
+						<td>Escape</td>
+						<td>Pause Game</td>
+					</tr>
+					<tr>
+						<td>Ctrl</td>
+						<td>Restart Game</td>
+					</tr>
+					<tr>
+						<td>K</td>
+						<td>Increase Speed</td>
+					</tr>
+					<tr>
+						<td>J</td>
+						<td>Decrease Speed</td>
+					</tr>
+					<tr>
+						<td>Space Bar</td>
+						<td>Allow/Disallow Opposite Direction</td>
+					</tr>
+				</table>
 			</div>
 			<div class="clear"></div>
 		</div>

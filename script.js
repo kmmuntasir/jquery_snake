@@ -1,12 +1,15 @@
 $(document).ready(function() {
 	var point = 0;
-	var intrvl = 50; // 100 ms
+	var speed_arr = [0, 290, 260, 230, 200, 170, 140, 110, 80, 50, 20];
+	var intrvl = $('#speed').val();
+	intrvl = speed_arr[intrvl];
 	var is_game_over = true;
-	var opposite_direction_allowed = false; // Snake can go 
+	var opposite_direction_allowed = false; // Snake can go in opposite direction
 	var n = 50;
 	var snake_length = 5;
 	var snake_x = new Array();
 	var snake_y = new Array();
+	var main_interval = null;
 	/**********************/
 
 	var direction_x = [0, 1, 0, -1];
@@ -24,47 +27,46 @@ $(document).ready(function() {
 	init();
 	draw_snake();
 	food();
-	setInterval(function(){
-		if(!is_game_over) {
-		 	move();
-		 	draw_snake();
+	
+
+	$(document).keydown(function(e) {
+		// console.log(e.which);
+		if (e.which == 37 || e.which == 65) // left
+			current_dir = (opposite_direction_allowed) ? 3 : ((current_dir != 1) ? 3 : current_dir);
+		else if (e.which == 38 || e.which == 87) // up
+			current_dir = (opposite_direction_allowed) ? 0 : ((current_dir != 2) ? 0 : current_dir);
+		else if (e.which == 39 || e.which == 68) // right
+			current_dir = (opposite_direction_allowed) ? 1 : ((current_dir != 3) ? 1 : current_dir);
+		else if (e.which == 40 || e.which == 83) // down
+			current_dir = (opposite_direction_allowed) ? 2 : ((current_dir != 0) ? 2 : current_dir);
+		else if (e.which == 27) { // escape
+			is_game_over = true; 
+			return;
 		}
-	}, intrvl);
+		else if (e.which == 17) { // ctrl
+			restart_game();
+			return;
+		}
+		else if (e.which == 32) { // space
+			$('#opposite_direction_allowed').click();
+			return;
+		}
+		else if (e.which == 74) { // J
+			decrease_speed();
+			return;
+		}
+		else if (e.which == 75) { // K
+			increase_speed();
+			return;
+		}
+		else return; // exit this handler for other keys
 
-	 $(document).keydown(function(e) {
-	     switch(e.which) {
-	         case 37: // left
-	         if(opposite_direction_allowed) current_dir = 3;
-	         else {
-	         	if(current_dir != 1) current_dir = 3;
-	         }
-	         break;
-
-	         case 38: // up
-	         if(opposite_direction_allowed) current_dir = 0;
-	         else {
-	         	if(current_dir != 2) current_dir = 0;
-	         }
-	         break;
-
-	         case 39: // right
-	         if(opposite_direction_allowed) current_dir = 1;
-	         else {
-	         	if(current_dir != 3) current_dir = 1;
-	         }
-	         break;
-
-	         case 40: // down
-	         if(opposite_direction_allowed) current_dir = 2;
-	         else {
-	         	if(current_dir != 0) current_dir = 2;
-	         }
-	         break;
-
-	         default: return; // exit this handler for other keys
-	     }
-	     e.preventDefault(); // prevent the default action (scroll / move caret)
-	 });
+		if(is_game_over) {
+			restart_interval();
+			is_game_over = false; 
+		}
+		e.preventDefault(); // prevent the default action (scroll / move caret)
+	});
 
 
 	/***************** Functions ******************/
@@ -74,18 +76,18 @@ $(document).ready(function() {
 		var ret = $(id).hasClass('food');
 		if(ret) { // Head's new position contains food
 			snake_length++;
-			snake_x.push(snake_x[snake_length-1]);
-			snake_y.push(snake_y[snake_length-1]);
-			for(var i=snake_length-1; i>0; i--) {
-				snake_x[i] = snake_x[i-1];
-				snake_y[i] = snake_y[i-1];
-			}
-			snake_x[0] += direction_x[current_dir];
-			snake_y[0] += direction_y[current_dir];
-			food();
-			point++;
-			$('#value').html('<h2>Total Point: ' + point + '</h2>');
+		snake_x.push(snake_x[snake_length-1]);
+		snake_y.push(snake_y[snake_length-1]);
+		for(var i=snake_length-1; i>0; i--) {
+			snake_x[i] = snake_x[i-1];
+			snake_y[i] = snake_y[i-1];
 		}
+		snake_x[0] += direction_x[current_dir];
+		snake_y[0] += direction_y[current_dir];
+		food();
+		point++;
+		$('#value').html('<h2>Total Point: ' + point + '</h2>');
+	}
 		else { // No food
 			for(var i=snake_length; i>0; i--) {
 				snake_x[i] = snake_x[i-1];
@@ -157,18 +159,20 @@ $(document).ready(function() {
 		$('.food').removeClass('food');
 		var id = '';
 		do {
-			var x = Math.floor((Math.random() * n) + 1);
-			var y = Math.floor((Math.random() * n) + 1);
+			var x = get_a_number(2, n-2)
+			var y = get_a_number(2, n-2)
 			id = '#pos' + x + '_' + (-y);
 			var ret1 = $(id).hasClass('green');
 			var ret2 = $(id).hasClass('red');
 			var ret3 = $(id).hasClass('head');
 		}while(ret1 || ret2 || ret3);
 		$(id).addClass('food');
+		// console.log(id);
 	}
 
 	$('#start_button').on('click', function() {
 		is_game_over = false;
+		restart_interval();
 	});
 
 	$('#pause_button').on('click', function() {
@@ -176,8 +180,56 @@ $(document).ready(function() {
 	});
 
 	$('#restart_button').on('click', function() {
-		is_game_over = false;
+		restart_game();
+	});
+
+	function restart_game() {
+		is_game_over = true;
+		point = 0;
+		snake_length = 5;
+		snake_x = new Array();
+		snake_y = new Array();
+		current_dir = 1;
+
 		init();
 		draw_snake();
+		food();
+		restart_interval();
+	}
+
+	$(document).on('change', '#opposite_direction_allowed', function() {
+		opposite_direction_allowed = $(this).prop('checked');
 	});
+
+	function get_a_number(min,max) { // min and max included
+	    return Math.floor(Math.random()*(max-min+1)+min);
+	}
+
+	function restart_interval() {
+		clearInterval(main_interval);
+		intrvl = $('#speed').val();
+		intrvl = speed_arr[intrvl];
+		main_interval = setInterval(function(){
+			if(!is_game_over) {
+				move();
+				draw_snake();
+			}
+		}, intrvl);
+	}
+
+	function increase_speed() {
+		var temp = $('#speed').val() * 1 + 1;
+		var max = $('#speed').attr('max');
+		if(temp > max) return;
+		$('#speed').val(temp);
+		restart_interval();
+	}
+
+	function decrease_speed() {
+		var temp = $('#speed').val() * 1 - 1;
+		var min = $('#speed').attr('min');
+		if(temp < min) return;
+		$('#speed').val(temp);
+		restart_interval();
+	}
 });
